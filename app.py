@@ -172,9 +172,16 @@ def load_fine_tuned_model():
         st.error("⚠️ HF_TOKEN not found in your environment secrets or .env file.")
         st.stop()
         
+    # base = AutoModelForCausalLM.from_pretrained(
+    #     "google/gemma-2b", 
+    #     dtype=torch.float32, 
+    #     token=token
+    # )
+    # Optimized for Streamlit Cloud Free Tier (prevents RAM OOM crashes)
     base = AutoModelForCausalLM.from_pretrained(
         "google/gemma-2b", 
-        dtype=torch.float32, 
+        dtype=torch.float16,           # Reduces memory usage by half compared to float32
+        low_cpu_mem_usage=True,        # Streams layers sequentially instead of caching all at once
         token=token
     )
     tokenizer = AutoTokenizer.from_pretrained("google/gemma-2b", token=token)
